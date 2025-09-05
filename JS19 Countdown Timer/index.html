@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Countdown Timer | CodeWithUzma</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin: 15px 0;
+      color: #facc15;
+      text-align: center;
+    }
+
+    .input-box {
+      margin-bottom: 20px;
+      text-align: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    input[type="datetime-local"] {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      font-size: 1rem;
+      flex: 1 1 200px;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #facc15;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #fbbf24;
+    }
+
+    .timer {
+      display: flex;
+      gap: 15px;
+      font-size: 1.6rem;
+      font-weight: bold;
+      margin-top: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .time-box {
+      text-align: center;
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      min-width: 70px;
+    }
+
+    .time-box span {
+      display: block;
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    footer {
+      margin-top: 25px;
+      font-size: 14px;
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.4rem;
+      }
+      .timer {
+        font-size: 1.3rem;
+        gap: 10px;
+      }
+      .time-box {
+        padding: 8px 12px;
+        min-width: 60px;
+      }
+      input[type="datetime-local"] {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Custom Countdown Timer ⏳</h1>
+
+  <div class="input-box">
+    <input type="datetime-local" id="dateInput">
+    <button class="btn" id="startBtn">Start</button>
+    <button class="btn" id="pauseBtn">Pause</button>
+    <button class="btn" id="resumeBtn">Resume</button>
+  </div>
+
+  <div class="timer">
+    <div class="time-box" id="days">00 <span>Days</span></div>
+    <div class="time-box" id="hours">00 <span>Hours</span></div>
+    <div class="time-box" id="minutes">00 <span>Minutes</span></div>
+    <div class="time-box" id="seconds">00 <span>Seconds</span></div>
+  </div>
+
+  <footer>✨ Created with ❤️ by CodeWithUzma ✨</footer>
+
+  <!-- Beep sound -->
+  <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
+
+  <script>
+    let countdown; 
+    let remainingTime; 
+    let isPaused = false;
+    let targetDate;
+
+    const daysEl = document.getElementById("days");
+    const hoursEl = document.getElementById("hours");
+    const minutesEl = document.getElementById("minutes");
+    const secondsEl = document.getElementById("seconds");
+    const alarmSound = document.getElementById("alarmSound");
+
+    // Start Button
+    document.getElementById("startBtn").addEventListener("click", () => {
+      const userDate = document.getElementById("dateInput").value;
+      if (!userDate) {
+        alert("Please select a valid date & time!");
+        return;
+      }
+      targetDate = new Date(userDate).getTime();
+      isPaused = false;
+      startCountdown();
+    });
+
+    // Pause Button
+    document.getElementById("pauseBtn").addEventListener("click", () => {
+      if (!isPaused) {
+        clearInterval(countdown);
+        isPaused = true;
+      }
+    });
+
+    // Resume Button
+    document.getElementById("resumeBtn").addEventListener("click", () => {
+      if (isPaused && remainingTime > 0) {
+        targetDate = new Date().getTime() + remainingTime;
+        isPaused = false;
+        startCountdown();
+      }
+    });
+
+    // Countdown Logic
+    function startCountdown() {
+      clearInterval(countdown);
+
+      countdown = setInterval(() => {
+        const now = new Date().getTime();
+        remainingTime = targetDate - now;
+
+        if (remainingTime <= 0) {
+          clearInterval(countdown);
+          document.querySelector(".timer").innerHTML = "🎊 Time's Up! 🎊";
+          alarmSound.play(); // Play sound alert
+          return;
+        }
+
+        const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+        daysEl.innerHTML = days + "<span>Days</span>";
+        hoursEl.innerHTML = hours + "<span>Hours</span>";
+        minutesEl.innerHTML = minutes + "<span>Minutes</span>";
+        secondsEl.innerHTML = seconds + "<span>Seconds</span>";
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
